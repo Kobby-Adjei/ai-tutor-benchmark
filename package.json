@@ -1,0 +1,20 @@
+{
+  "name": "ai-tutor-benchmark",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Which language model can actually teach? A three-stage benchmark for a voice coding tutor.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "stage1": "mkdir -p out && tsx --env-file=.env harness/bench-brains.mts out/stage1.json",
+    "stage2": "mkdir -p out && tsx --env-file=.env harness/bench-teaching.mts out/stage2.json",
+    "stage3": "mkdir -p out && tsx --env-file=.env harness/bench-deep.mts out/stage3.json"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}

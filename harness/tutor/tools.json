@@ -1,0 +1,206 @@
+[
+  {
+    "name": "highlight_lines",
+    "description": "Highlight the block of lines you are about to explain. Call it before you start explaining that block.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "start_line",
+        "end_line"
+      ],
+      "properties": {
+        "start_line": {
+          "type": "integer"
+        },
+        "end_line": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string",
+          "description": "two or three words naming the block"
+        }
+      }
+    }
+  },
+  {
+    "name": "circle",
+    "description": "Circle one small piece of code to stress it: a name, a call, an operator.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "line",
+        "text"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string",
+          "description": "the exact code on that line to circle"
+        }
+      }
+    }
+  },
+  {
+    "name": "point_to",
+    "description": "Move your pointer to a line, optionally to a piece of code on it.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "line"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "write_code",
+    "description": "Type code into the editor yourself, at a person's pace, so they watch it appear. Write one small piece at a time and talk while it lands. Do not paste a whole solution.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "the exact code to type, newlines and all"
+        },
+        "at_line": {
+          "type": "integer",
+          "description": "line to start on; leave out to carry on at the end"
+        }
+      }
+    }
+  },
+  {
+    "name": "change_line",
+    "description": "Go back and rewrite one line you already wrote. This is how you fix something you left out on purpose: write the plain version first, let them see it fall over, then come back here.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "line",
+        "to"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer"
+        },
+        "to": {
+          "type": "string",
+          "description": "what that line should say instead"
+        }
+      }
+    }
+  },
+  {
+    "name": "run_code",
+    "description": "Press Run on the code in the editor, exactly as the viewer would, and hear which tests pass. Use it after you write the plain version, so the failing case is shown rather than claimed.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "draw",
+    "description": "Draw the data on a board over the code: an array or a map, with named arrows under the cells they point at. Use it when what is hard is the data moving, not the syntax. Call it again with new values to show the next step.",
+    "parameters": {
+      "type": "object",
+      "required": [
+        "kind",
+        "cells"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "\"array\" or \"map\""
+        },
+        "name": {
+          "type": "string",
+          "description": "what it is called in the code, such as nums or seen"
+        },
+        "cells": {
+          "type": "array",
+          "description": "the values, left to right. For a map use \"key:value\".",
+          "items": {
+            "type": "object",
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "mark": {
+                "type": "string",
+                "description": "\"good\" for the answer, \"gone\" for ruled out"
+              }
+            }
+          }
+        },
+        "points": {
+          "type": "array",
+          "description": "arrows under cells: lo, hi, mid, i, j",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "at"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "at": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "note": {
+          "type": "string",
+          "description": "at most six words under the picture, or leave it out"
+        }
+      }
+    }
+  },
+  {
+    "name": "trace_start",
+    "description": "Run the code on screen on the example and show it running beside the code: the list with its arrow, the box filling up, the line lit as it runs. Real values, never guessed. Use it when the confusion is about what the data does over time. After calling it you are given one beat at a time to say out loud.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "trace_end",
+    "description": "Put the running picture away when you go back to talking about the code.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "clear_board",
+    "description": "Take the board away when you go back to talking about the code.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "clear_annotations",
+    "description": "Remove your highlights and circles when you move on to a new topic.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+]

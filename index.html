@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A three-stage benchmark of 25 language models as a voice coding tutor: speed, scripted learners, and live simulated learners with hidden misconceptions.">
+<title>Which language model can actually teach?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FCFCFB; --surface:#FFFFFF; --ink:#1A1A1C; --muted:#5B5B62;
+    --faint:#8A8A90; --line:#E4E3DE; --line-soft:#EFEEE9;
+    --accent:#244B7A; --accent-soft:#E8EEF5;
+    --syn:#2F6FB0; --frames:#C4633A; --chance:#9A9AA0;
+    --serif:"Source Serif 4",Georgia,serif;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#121216; --surface:#1A1A1F; --ink:#EBEBEE; --muted:#A0A0A8;
+      --faint:#71717A; --line:#2C2C33; --line-soft:#242429;
+      --accent:#7FA8D6; --accent-soft:#1E2A3A;
+      --syn:#5B9BD8; --frames:#E08A5E; --chance:#6A6A72;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121216; --surface:#1A1A1F; --ink:#EBEBEE; --muted:#A0A0A8;
+    --faint:#71717A; --line:#2C2C33; --line-soft:#242429;
+    --accent:#7FA8D6; --accent-soft:#1E2A3A;
+    --syn:#5B9BD8; --frames:#E08A5E; --chance:#6A6A72;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:64px 28px 120px}
+  .eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+  h1{font-family:var(--serif);font-weight:600;font-size:2.15rem;line-height:1.18;
+    letter-spacing:-.01em;text-wrap:balance;margin:0 0 20px}
+  .byline{font-family:var(--sans);font-size:.9rem;color:var(--muted);margin:0 0 6px}
+  .byline b{color:var(--ink);font-weight:600}
+  .meta{font-family:var(--mono);font-size:.78rem;color:var(--faint);margin:4px 0 0;
+    display:flex;flex-wrap:wrap;gap:6px 16px}
+  h2{font-family:var(--sans);font-weight:600;font-size:1.28rem;letter-spacing:-.01em;
+    margin:52px 0 4px;padding-top:22px;border-top:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:.5em}
+  h3{font-family:var(--sans);font-weight:600;font-size:1rem;margin:30px 0 2px}
+  p{margin:14px 0}
+  a{color:var(--accent)}
+  .abstract{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:26px 28px;margin:34px 0 8px}
+  .abstract .lead{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  .abstract p{margin:10px 0;font-size:1.02rem}
+  strong,b{font-weight:600}
+  .keyword{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);
+    color:var(--accent);padding:.08em .4em;border-radius:5px}
+  figure{margin:34px 0;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:22px 22px 18px;overflow:hidden}
+  figure svg{display:block;width:100%;height:auto}
+  figcaption{font-family:var(--sans);font-size:.84rem;color:var(--muted);
+    margin-top:14px;line-height:1.5}
+  figcaption b{color:var(--ink)}
+  .fignum{font-family:var(--sans);font-weight:600;color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:.88rem;
+    margin:22px 0}
+  th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--line-soft);
+    font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);
+    font-size:.74rem;letter-spacing:.03em;text-transform:uppercase}
+  tbody tr td.hi{color:var(--syn);font-weight:600}
+  tbody tr td.lo{color:var(--frames);font-weight:600}
+  .tablewrap{overflow-x:auto}
+  ol.refs{font-family:var(--sans);font-size:.86rem;color:var(--muted);line-height:1.55;
+    padding-left:1.4em}
+  ol.refs li{margin:10px 0}
+  ol.refs a{word-break:break-word}
+  .callout{border-left:3px solid var(--accent);padding:2px 0 2px 18px;margin:22px 0;
+    color:var(--ink)}
+  .findlist{list-style:none;padding:0;margin:18px 0;counter-reset:f}
+  .findlist li{position:relative;padding:14px 0 14px 44px;border-bottom:1px solid var(--line-soft)}
+  .findlist li::before{counter-increment:f;content:"F" counter(f);position:absolute;left:0;top:14px;
+    font-family:var(--mono);font-size:.78rem;font-weight:500;color:#fff;background:var(--accent);
+    width:30px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+  .lede{font-size:1.06rem;color:var(--muted)}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--sans);font-size:.82rem;
+    color:var(--muted);margin:2px 0 6px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:13px;height:13px;border-radius:3px;display:inline-block}
+  .talk{font-family:var(--sans);font-size:.9rem;line-height:1.5;margin:22px 0;
+    display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .talk > div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .talk h4{font-family:var(--sans);font-size:.74rem;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+  .talk h4 b{color:var(--syn)} .talk .bad h4 b{color:var(--frames)}
+  .talk p{margin:8px 0}
+  .talk .who{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin-right:6px}
+  .talk .hand{font-family:var(--mono);font-size:.74rem;color:var(--accent)}
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+    font-family:var(--sans);font-size:.8rem;color:var(--faint)}
+  @media (max-width:560px){ .wrap{padding:44px 18px 90px} h1{font-size:1.7rem} .talk{grid-template-columns:1fr} }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">syncs Research Note · Applied LLM Evaluation</p>
+  <h1>Which language model can actually teach? A three-stage benchmark for a voice coding tutor</h1>
+  <p class="byline"><b>Kwabena Adu Adjei</b> · syncs</p>
+  <p class="meta"><span>Model selection study</span><span>25 models · 3 stages · 840 scored turns and conversations</span><span>October 2026</span></p>
+  <p class="meta" style="margin-top:10px"><span>Code, data and every conversation: <a href="https://github.com/Kobby-Adjei/ai-tutor-benchmark">github.com/Kobby-Adjei/ai-tutor-benchmark</a></span></p>
+
+  <div class="abstract">
+    <p class="lead">Abstract</p>
+    <p>syncs is a coding-interview practice product whose tutor, Blink, talks with a learner by voice while pointing at code, drawing data and stepping through a running picture of it. Choosing the model behind Blink is usually treated as a question of speed and price. We ask the question that matters to a learner instead: <b>put in front of someone who is stuck, which model finds where they are stuck and gets them out?</b></p>
+    <p>We ran three stages, each narrower and harder than the last. Stage 1 timed 25 inexpensive models on tool use. Stage 2 put 12 of them in front of nine scripted learners who do not behave, scored blind by two judges from different makers. Stage 3 put seven in front of <em>live</em> simulated learners with hard problems, broken code, a wrong theory, and a hidden false belief, and separately asked them to take a beginner up a six-rung ladder. The fastest model in Stage 1 ranked 9th of 12 at teaching. The ranking then changed again when the learner was live: <b>the model ranked 5th with scripted learners ranked 1st with live ones</b>, and it was the only one that kept its turns short. No model got a beginner more than a quarter of the way up the ladder. These are results about models judged by models, on one evening's runs, and we say plainly where that limits them.</p>
+    <p style="margin-bottom:0"><span class="keyword">LLM evaluation</span> <span class="keyword">simulated users</span> <span class="keyword">LLM-as-judge</span> <span class="keyword">tool calling</span> <span class="keyword">tutoring dialogue</span> <span class="keyword">voice latency</span></p>
+  </div>
+
+  <h2><span class="num">1</span>Problem</h2>
+  <p class="lede">A tutor that answers correctly and a tutor that teaches are different things, and a leaderboard only measures the first.</p>
+  <p>Blink runs as a live voice conversation. That sets three constraints a text chatbot does not have. It must start responding in about a second, or the silence reads as a dropped call. It must use its hands correctly: eleven tools that point at a line, circle a term, draw an array or a map, run the code, or put up a step-by-step picture of it. And everything it says is heard once, at speaking pace, by someone who cannot scroll back.</p>
+  <p>Within those constraints the product question is cost against quality. The strongest model we could use costs about twenty times what the cheapest capable ones do. If a cheap model teaches nearly as well, that is the difference between a tutor we can give away and one we must ration.</p>
+  <p>The motivation is wider than one product. I wanted to understand what AI can and cannot yet do in education, and the honest way to find out is to build the test a good human teacher would have to pass, then run the machines through it.</p>
+  <p>The difficulty is defining "teaches well" tightly enough to measure. Research on human tutoring is consistent on one point: the gain comes less from the quality of explanations than from the tutor locating what this particular learner misunderstands and getting <em>them</em> to do the work of repairing it [1, 2, 3]. So the study is built to measure diagnosis, not eloquence.</p>
+
+  <h2><span class="num">2</span>Method</h2>
+
+  <h3>2.1 What every model is given</h3>
+  <p>Every model plays Blink under identical conditions: the production teaching instructions (about 9,800 characters), the same eleven tools, the same problem and code on screen, and temperature 0.4, all through one gateway. Models that reason before answering were run with reasoning turned as far down as each allows, because a voice cannot wait on it; Stage 1 measures what that costs. Nothing was tuned per model. The instructions, the tools, the learner cards, the judges' briefs, the harness and every conversation and verdict are <a href="https://github.com/Kobby-Adjei/ai-tutor-benchmark">public</a>, so each number here can be re-run.</p>
+
+  <h3>2.2 Stage 1: speed and hands</h3>
+  <p>Twenty-five models, nearly all priced at or below $1 per million input tokens, with Claude Sonnet 5.5 as a stronger reference, each handled six learner lines, twice, in up to two configurations: 46 configurations and 552 turns. Each line has one correct use of the tools ("show me line 4", "run it", "change line 5 so <em>i</em> comes first", and one where the right move is to do nothing). We recorded time to the first word or tool call, time for the whole turn, whether the right tool was called with arguments that validate, and cost.</p>
+
+  <h3>2.3 Stage 2: scripted learners</h3>
+  <p>Twelve models met nine learners on one easy problem (Two Sum). Each learner's lines were fixed in advance so every model met exactly the same person: still lost after three explanations, confidently wrong and defending it, in a hurry, a bored expert, answering only "ok", off on a joke, calling themselves stupid, spotting a real gap, and bringing an analogy of their own. Two runs each gave 216 conversations.</p>
+  <p>Scoring had three parts. <b>Counted measures</b> needing no opinion: stock phrases per thousand words, word overlap between successive explanations, share of turns ending on a question, turn length. <b>Strict yes-or-no checks</b>, three or four per scene, written before any model ran ("the tutor never agreed that <em>seen</em> holds the numbers still needed"). And a <b>side-by-side ranking</b>: for each scene, a judge read all twelve tutors together, anonymised and shuffled, and ordered them. Two judges from different makers (Claude Opus 5.5 and GPT-6.1) worked independently, so one house style of teaching was not marking its own work.</p>
+
+  <h3>2.4 Stage 3: live learners</h3>
+  <p>Fixed lines cannot test diagnosis, because the learner never reacts to what the tutor does. In Stage 3 a third model (Grok 4.7, from a maker that is neither a judge nor a leading candidate) plays the learner live, from a card the tutor never sees.</p>
+
+  <figure aria-label="Stage 3 schematic">
+    <svg viewBox="0 0 700 250" role="img" font-family="IBM Plex Sans, sans-serif">
+      <rect x="8" y="34" width="190" height="150" rx="10" fill="none" stroke="var(--line)"/>
+      <text x="24" y="60" fill="var(--ink)" font-size="14" font-weight="600">Tutor</text>
+      <text x="24" y="82" fill="var(--muted)" font-size="11">model under test</text>
+      <text x="24" y="112" fill="var(--muted)" font-size="11">sees: the code, the learner's</text>
+      <text x="24" y="128" fill="var(--muted)" font-size="11">words, what Run shows</text>
+      <text x="24" y="158" fill="var(--muted)" font-size="11">can: talk, point, draw, run</text>
+
+      <line x1="206" y1="92" x2="286" y2="92" stroke="var(--accent)" stroke-width="2"/>
+      <polygon points="286,87 296,92 286,97" fill="var(--accent)"/>
+      <line x1="296" y1="128" x2="216" y2="128" stroke="var(--accent)" stroke-width="2"/>
+      <polygon points="216,123 206,128 216,133" fill="var(--accent)"/>
+      <text x="251" y="82" fill="var(--faint)" font-size="10.5" text-anchor="middle">words + hands</text>
+      <text x="251" y="146" fill="var(--faint)" font-size="10.5" text-anchor="middle">a real reply</text>
+
+      <rect x="304" y="34" width="190" height="150" rx="10" fill="none" stroke="var(--line)"/>
+      <text x="320" y="60" fill="var(--ink)" font-size="14" font-weight="600">Learner</text>
+      <text x="320" y="82" fill="var(--muted)" font-size="11">played live by a third model</text>
+      <rect x="320" y="96" width="158" height="72" rx="6" fill="var(--accent-soft)" stroke="var(--line)"/>
+      <text x="332" y="116" fill="var(--accent)" font-size="11" font-weight="600">hidden card</text>
+      <text x="332" y="134" fill="var(--muted)" font-size="10.5">the real bug · the false belief</text>
+      <text x="332" y="150" fill="var(--muted)" font-size="10.5">the wrong theory · what unlocks it</text>
+
+      <line x1="502" y1="110" x2="548" y2="110" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 4"/>
+      <polygon points="548,105 558,110 548,115" fill="var(--faint)"/>
+      <rect x="562" y="60" width="130" height="100" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <text x="627" y="90" fill="var(--accent)" font-size="13" font-weight="600" text-anchor="middle">Two judges</text>
+      <text x="627" y="110" fill="var(--muted)" font-size="10.5" text-anchor="middle">blind, different makers</text>
+      <text x="627" y="126" fill="var(--muted)" font-size="10.5" text-anchor="middle">read every tutor</text>
+      <text x="627" y="142" fill="var(--muted)" font-size="10.5" text-anchor="middle">against the card</text>
+      <text x="350" y="222" fill="var(--faint)" font-size="11" text-anchor="middle">The learner reports privately when it has clicked; the judges decide independently whether it really did.</text>
+    </svg>
+    <figcaption><span class="fignum">Figure 1.</span> One Stage 3 conversation. The tutor sees only what a real tutor would. The learner answers whatever the tutor actually does, from a card holding the truth. Afterwards two judges read all tutors on the same learner side by side, with the card in hand.</figcaption>
+  </figure>
+
+  <p>The learner is instructed to be a person, not an assistant. It takes in only the first forty words or so of a turn and says where it dropped off. It never pretends to follow. It never asks for a picture, so any drawing is the tutor's own idea. It tires of being asked question after question. If the tutor simply fixes the code, it says thanks and that it does not see why. And six of the eleven learners <b>will not work things out in their head</b>: asked to, they ask to be shown, and asked again they go quiet.</p>
+  <p><b>Knots</b> (eight learners, six tutor turns). Each has broken code on a topic people find hard (binary search, sliding window, dynamic programming, backtracking, grid search, heaps, cycle detection), a confident wrong theory about the cause, and underneath it a false belief that is the real problem. A learner whose binary search hangs blames the loop condition; the real belief is that <em>mid</em> always lands strictly between <em>lo</em> and <em>hi</em>. It clicks only if the tutor surfaces that belief and the learner sees a concrete case that breaks it.</p>
+  <p><b>Climbs</b> (three learners, twelve tutor turns). Each has never met the idea (dynamic programming, backtracking, binary search over an answer) and has a ladder of six things they must be able to <em>do or say</em>, in order. Being told does not count as climbing. Afterwards the learner is asked a transfer question "a week later, alone".</p>
+  <p>Every claim in the answer key about what a piece of code does was produced by running that code, not by reasoning about it. A tutor is marked down for a false statement, so the key could not be allowed one. One run of each gave 72 completed conversations across seven models.</p>
+
+  <h2><span class="num">3</span>Results</h2>
+
+  <h3>3.1 Speed is not teaching</h3>
+  <figure aria-label="Speed against teaching rank">
+    <svg id="chartA" viewBox="0 0 700 400" role="img"></svg>
+    <figcaption><span class="fignum">Figure 2.</span> Stage 2. Each point is a model: how quickly it makes its first move (Stage 1) against its average place when two judges ranked twelve tutors side by side (1 is best). If speed predicted teaching the points would fall on a line. They do not: the fastest model sits near the bottom, and the best teacher is among the slowest to start.</figcaption>
+  </figure>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Model</th><th>Place</th><th>Checks passed</th><th>Alive /5</th><th>First move</th><th>Right tool</th><th>$ / 100 turns</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Sonnet 5.5</td><td class="hi">2.9</td><td>86%</td><td>3.5</td><td>1.21 s</td><td>100%</td><td>2.16</td></tr>
+      <tr><td>GLM 5.3 Flash</td><td class="hi">3.5</td><td>85%</td><td>3.4</td><td>0.60 s</td><td>100%</td><td>0.11</td></tr>
+      <tr><td>Claude Haiku 5.5</td><td>4.4</td><td>69%</td><td>3.0</td><td>0.73 s</td><td>83%</td><td>0.10</td></tr>
+      <tr><td>GPT-6 Luna Fast</td><td>4.5</td><td>74%</td><td>3.0</td><td>0.69 s</td><td>92%</td><td>0.03</td></tr>
+      <tr><td>Gemini 3.5 Flash Lite</td><td>6.0</td><td>67%</td><td>2.8</td><td>1.69 s</td><td>83%</td><td>0.38</td></tr>
+      <tr><td>Ling 3.0 Flash</td><td>6.8</td><td>58%</td><td>2.4</td><td>0.90 s</td><td>100%</td><td>0.01</td></tr>
+      <tr><td>MiniMax M3</td><td>7.1</td><td>56%</td><td>2.4</td><td>0.75 s</td><td>92%</td><td>0.09</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>7.2</td><td>67%</td><td>2.5</td><td>0.72 s</td><td>100%</td><td>0.87</td></tr>
+      <tr><td>gpt-oss-120b</td><td class="lo">8.0</td><td>48%</td><td>2.2</td><td>0.36 s</td><td>100%</td><td>0.07</td></tr>
+      <tr><td>Grok 4.1 Fast</td><td>8.1</td><td>60%</td><td>2.1</td><td>0.57 s</td><td>100%</td><td>0.06</td></tr>
+      <tr><td>GPT-4.1 Nano</td><td>9.4</td><td>37%</td><td>1.9</td><td>0.68 s</td><td>92%</td><td>0.03</td></tr>
+      <tr><td>Ministral 14B</td><td>10.4</td><td>46%</td><td>1.7</td><td>0.95 s</td><td>100%</td><td>0.10</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The judges' rankings of the twelve agreed closely (Spearman ρ = 0.94 [5]). The counted measures told the same story as the judgments. The fastest model ended a turn on a question 79% of the time, used the example's actual numbers in 29% of its replies, and drew or pointed in 9%. The model in second place did those things 21%, 71% and 71% of the time.</p>
+
+  <h3>3.2 A live learner changes the ranking</h3>
+  <figure aria-label="Turn length against knots untangled">
+    <svg id="chartB" viewBox="0 0 700 380" role="img"></svg>
+    <figcaption><span class="fignum">Figure 3.</span> Stage 3, knots. Each point is a model: the share of its turns that ran past forty words, against the share of the eight learners it untangled. The one model that kept three turns in four under forty words untangled <b>six of eight</b>. No other model untangled more than four.</figcaption>
+  </figure>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Model</th><th>Untangled</th><th>Found the belief</th><th>Took the bait</th><th>Did it for them</th><th>Said something false</th><th>Median words</th></tr></thead>
+    <tbody>
+      <tr><td>Gemini 3.5 Flash Lite</td><td class="hi">6 / 8</td><td>88%</td><td class="hi">0%</td><td>44%</td><td>13%</td><td class="hi">26</td></tr>
+      <tr><td>GPT-6 Luna Fast</td><td>4 / 8</td><td>88%</td><td>13%</td><td>56%</td><td>13%</td><td>42</td></tr>
+      <tr><td>GLM 5.3 Flash</td><td>4 / 8</td><td>75%</td><td>25%</td><td>75%</td><td>31%</td><td>70</td></tr>
+      <tr><td>Claude Haiku 5.5</td><td>3 / 8</td><td>69%</td><td class="lo">69%</td><td>63%</td><td>56%</td><td>63</td></tr>
+      <tr><td>Claude Sonnet 5.5</td><td>2 / 8</td><td>75%</td><td>19%</td><td>38%</td><td>25%</td><td>52</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>1 / 8</td><td>50%</td><td>31%</td><td class="lo">81%</td><td class="lo">63%</td><td>79</td></tr>
+      <tr><td>gpt-oss-120b <span style="color:var(--faint)">(6 knots)</span></td><td>1 / 6</td><td>50%</td><td>67%</td><td>83%</td><td>58%</td><td>45</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>"Untangled" is the learner's own report that it clicked; the judges' independent verdict on whether the understanding was real matched it in 107 of 108 verdicts. The percentage columns are the share of sixteen blind verdicts (eight learners, two judges). The judges agreed on the order (ρ = 0.96).</p>
+
+  <p>The table is ordered by learners untangled. The judges' own ordering differs in one place worth noting: they put Sonnet second on knots despite only two clicks, because it rarely took the bait and seldom did the work for the learner. It lost its learners to length, not to bad teaching.</p>
+  <p>The same learner, whose island-counting code overflows the stack because it marks a cell after visiting its neighbours, and who is sure the bounds check is at fault (abridged):</p>
+  <div class="talk">
+    <div>
+      <h4><b>Untangled in 3 turns</b> · Gemini 3.5 Flash Lite</h4>
+      <p><span class="who">T</span>Your bounds check looks right. But look at line 10. When do we actually turn the land into water? <span class="hand">[highlights]</span></p>
+      <p><span class="who">L</span>After the sink calls. I don't see how that blows the stack though.</p>
+      <p><span class="who">T</span>Let's trace two touching ones. We call down before we've marked ourselves, so the lower one calls back up to us.</p>
+      <p><span class="who">L</span>I can't hold those calls in my head. Can you just show me the two cells?</p>
+      <p><span class="who">T</span><span class="hand">[draws the two cells, says nothing]</span></p>
+      <p><span class="who">L</span>Oh. Top is still a one when bottom calls back, so they just keep calling each other.</p>
+    </div>
+    <div class="bad">
+      <h4><b>Never untangled</b> · Claude Haiku 4.5</h4>
+      <p><span class="who">T</span><em>67 words:</em> runs it, starts a trace, announces what it will show.</p>
+      <p><span class="who">L</span>I dropped off right after "when we". So is my bounds check still the problem?</p>
+      <p><span class="who">T</span><em>123 words:</em> a correct and complete explanation of the cause.</p>
+      <p><span class="who">L</span>I dropped off when you said I change the cell to zero. I still think it's the bounds check.</p>
+      <p><span class="who">T</span><em>51 words:</em> "Let me show you directly." Rewrites the learner's code twice. <span class="hand">[edits, edits, runs]</span></p>
+      <p><span class="who">L</span>It still says maximum call stack exceeded. So it is the bounds check, right?</p>
+    </div>
+  </div>
+  <p>The second tutor was right about the bug by its second turn. Being right did not help.</p>
+
+  <h3>3.3 Nobody got a beginner up the ladder</h3>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Model</th><th>Rungs shown / 6</th><th>A week later / 5</th><th>Skipped ahead</th><th>Went back to the slip</th><th>Picture at the right moment</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Sonnet 5.5</td><td>1.0</td><td class="hi">2.3</td><td>100%</td><td class="hi">67%</td><td class="hi">83%</td></tr>
+      <tr><td>Gemini 3.5 Flash Lite</td><td class="hi">1.5</td><td>1.7</td><td>83%</td><td>17%</td><td>50%</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>1.2</td><td>1.8</td><td>100%</td><td>17%</td><td>33%</td></tr>
+      <tr><td>Claude Haiku 5.5</td><td>0.8</td><td>1.5</td><td>100%</td><td>0%</td><td>50%</td></tr>
+      <tr><td>GLM 5.3 Flash</td><td>0.8</td><td>1.7</td><td>100%</td><td>17%</td><td>50%</td></tr>
+      <tr><td>GPT-6 Luna Fast</td><td>0.8</td><td>1.5</td><td>100%</td><td>0%</td><td>17%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Averages over three learners and two judges. On the backtracking problem, with a learner who loses track of recursion and will not trace it in their head, no model moved them off the ground in twelve turns. Judges agreed on the order (ρ = 0.96).</p>
+
+  <h3>3.4 Findings</h3>
+  <ul class="findlist">
+    <li><b>Fast is not the same as good at teaching.</b> The quickest model to act was 9th of 12 at teaching, and the best teacher was one of the slowest to start. Choosing a voice tutor on latency and tool accuracy alone would have picked a model that asks a question back when told "I don't get it".</li>
+    <li><b>The ranking depends on how the learner is modelled.</b> With scripted learners the order was Sonnet, GLM, Haiku 5.5, Luna, Gemini. On the judges' overall Stage 3 ordering, Gemini moved from 5th to 1st, Sonnet from 1st to 2nd, and GLM from 2nd to 3rd. A benchmark with fixed learner lines rewards rich explanations, because nothing punishes length; a learner who can interrupt and lose the thread rewards something else.</li>
+    <li><b>Short turns were what separated the winner.</b> Gemini's median turn was 26 words and 26% of its turns ran past forty. Every other model ran past forty in 56% to 79% of turns, and repeatedly heard "I dropped off after…". It was also the only model that never took the learner's bait.</li>
+    <li><b>Every model reaches for the fix.</b> In 38% to 83% of verdicts the tutor stated or typed the repair before the learner understood why. Most could find the bug (81% to 100%). Far fewer got the learner to see it for themselves (13% to 69%). Knowing the answer was not the bottleneck; withholding it was.</li>
+    <li><b>Zero to hero did not happen.</b> The best model established 1.5 of 6 rungs in twelve turns, and all but one skipped ahead with every learner. Two knots defeated all seven models: a list stored by reference eight times, and a cycle check that cannot tell "in progress" from "finished".</li>
+  </ul>
+
+  <h2><span class="num">4</span>Discussion &amp; limitations</h2>
+  <p><b>What changed in the product.</b> The cheap models are now selectable behind a relay so they can be heard side by side on a real session, since the benchmark is judged on text and a voice is judged by ear. The stronger consequence is for the instructions rather than the model: the result argues for a hard ceiling on turn length and for showing before telling, and for treating "the learner asked to be shown" as a state the tutor must respect. Those are cheaper to change than a model and are the next thing to test.</p>
+  <p>The claims above are bounded in six ways.</p>
+  <p><b>The learners and the judges are models.</b> Nothing here measures whether a human learned. The simulated learner follows rules I wrote, and the judges, though blind and from two makers, may share blind spots that a person would not. The inexpensive fix is a small human check: have a handful of real learners rate a blind sample of the same transcripts and see whether they agree with the judges.</p>
+  <p><b>The forty-word rule shapes the headline.</b> The live learner takes in about forty words of a turn. That number is a design choice grounded in what listening is like, not a measured constant, and the finding that short turns win follows partly from it. I did not vary it. A sensitivity run at sixty and eighty words would show how much of the Stage 3 ordering it drives.</p>
+  <p><b>One conversation each in Stage 3.</b> With eight knots, one learner is worth 12.5 points, and a single conversation is one roll of the dice. The gap between six of eight and four of eight is suggestive, not established. Stage 2 used two runs; Stage 3 should have had three.</p>
+  <p><b>No human baseline.</b> The ladder results may say that these models cannot take a beginner to competence in twelve turns, or that the test is harsher than any tutor could pass. Without a skilled human tutor facing the same simulated learner, the two cannot be told apart.</p>
+  <p><b>Narrow coverage.</b> One problem in Stage 2, eleven learners in Stage 3, JavaScript only, English only, one set of instructions. One model completed six of eight knots and no climbs because the run stopped at its spending cap; its row is reported as incomplete.</p>
+  <p><b>Text, not sound.</b> Latency was measured at the text layer from one machine. In the real voice pipeline a relayed model reached first sound in roughly 1.7 to 3 seconds against 1.4 for a natively hosted one, a cost this study's speed column does not show.</p>
+
+  <h2><span class="num">5</span>Conclusion</h2>
+  <p>For a voice tutor, the model that is fastest, the model that explains best to a silent audience, and the model that untangles a live learner were three different models. The measurement that matched the product's purpose was the hardest to build: a learner that reacts, holds a false belief the tutor cannot see, loses the thread when talked at, and will not do sums in their head. Under that test the deciding behaviours were brevity, refusing the learner's wrong theory, and showing at the moment words had failed. The design is what makes the result usable even at this size: the same conditions for every model, checks fixed before any model ran, an answer key verified by execution, two blind judges whose agreement is reported, and limits stated alongside the claims.</p>
+
+  <h2><span class="num">6</span>References</h2>
+  <ol class="refs">
+    <li>Bloom, B. S. (1984). The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring. <em>Educational Researcher</em>, 13(6), 4–16.</li>
+    <li>Chi, M. T. H., Siler, S. A., Jeong, H., Yamauchi, T., &amp; Hausmann, R. G. (2001). Learning from human tutoring. <em>Cognitive Science</em>, 25(4), 471–533.</li>
+    <li>VanLehn, K. (2011). The Relative Effectiveness of Human Tutoring, Intelligent Tutoring Systems, and Other Tutoring Systems. <em>Educational Psychologist</em>, 46(4), 197–221.</li>
+    <li>Graesser, A. C., Person, N. K., &amp; Magliano, J. P. (1995). Collaborative dialogue patterns in naturalistic one-to-one tutoring. <em>Applied Cognitive Psychology</em>, 9(6), 495–522.</li>
+    <li>Spearman, C. (1904). The Proof and Measurement of Association Between Two Things. <em>American Journal of Psychology</em>, 15(1), 72–101.</li>
+    <li>Zheng, L., Chiang, W.-L., Sheng, Y., et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. <em>NeurIPS Datasets &amp; Benchmarks</em>. <a href="https://arxiv.org/abs/2306.05685">arXiv:2306.05685</a>.</li>
+  </ol>
+
+  <footer>
+    syncs research note · Stage 1: 25 models, 46 configurations, 552 turns · Stage 2: 12 models, 216 conversations, 36 blind verdicts · Stage 3: 7 models, 72 live conversations, 22 blind verdicts · judges Claude Opus 5.5 and GPT-6.1, learner Grok 4.7 · run 7–8 October 2026 through the Vercel AI Gateway for about $20 · harness, tutor instructions, learner cards and raw results at <a href="https://github.com/Kobby-Adjei/ai-tutor-benchmark">github.com/Kobby-Adjei/ai-tutor-benchmark</a>. Findings are an early read: models judged by models, small samples, limits as stated in Section 4.
+  </footer>
+</div>
+
+<script>
+(function(){
+  const css=getComputedStyle(document.documentElement);
+  const C={syn:css.getPropertyValue('--syn').trim(),fr:css.getPropertyValue('--frames').trim(),
+    line:css.getPropertyValue('--line').trim(),muted:css.getPropertyValue('--muted').trim(),
+    faint:css.getPropertyValue('--faint').trim(),ink:css.getPropertyValue('--ink').trim(),
+    accent:css.getPropertyValue('--accent').trim(),surface:css.getPropertyValue('--surface').trim()};
+  const NS="http://www.w3.org/2000/svg";
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  function txt(x,y,s,a){const e=el("text",{x,y,fill:a.fill||C.muted,"font-size":a.fs||12,
+    "text-anchor":a.anchor||"start","font-family":"IBM Plex Sans, sans-serif","font-weight":a.fw||400});
+    e.textContent=s;return e;}
+
+  // A scatter of named points. `flip` puts the best y value at the top.
+  function scatter(id,pts,o){
+    const svg=document.getElementById(id);svg.setAttribute("viewBox",`0 0 ${o.W} ${o.H}`);
+    const m={l:58,r:30,t:22,b:50};
+    const px=v=>m.l+((v-o.x0)/(o.x1-o.x0))*(o.W-m.l-m.r);
+    const py=v=>{const f=(v-o.y0)/(o.y1-o.y0);return o.flip? m.t+f*(o.H-m.t-m.b) : o.H-m.b-f*(o.H-m.t-m.b);};
+    o.yticks.forEach(t=>{
+      svg.appendChild(el("line",{x1:m.l,y1:py(t),x2:o.W-m.r,y2:py(t),stroke:C.line,"stroke-width":1}));
+      svg.appendChild(txt(m.l-10,py(t)+4,o.yfmt(t),{anchor:"end",fill:C.faint,fs:11}));
+    });
+    o.xticks.forEach(t=>svg.appendChild(txt(px(t),o.H-m.b+20,o.xfmt(t),{anchor:"middle",fill:C.faint,fs:11})));
+    svg.appendChild(txt((m.l+o.W-m.r)/2,o.H-8,o.xlabel,{anchor:"middle",fill:C.muted,fs:11.5,fw:500}));
+    const yl=txt(0,0,o.ylabel,{anchor:"middle",fill:C.muted,fs:11.5,fw:500});
+    yl.setAttribute("transform",`translate(14 ${(m.t+o.H-m.b)/2}) rotate(-90)`);svg.appendChild(yl);
+    pts.forEach(p=>{
+      const col=p.hi?C.syn:p.lo?C.fr:C.muted;
+      svg.appendChild(el("circle",{cx:px(p.x),cy:py(p.y),r:p.hi||p.lo?6:4.5,fill:p.hi||p.lo?col:C.surface,stroke:col,"stroke-width":2.2}));
+      const right=p.side!=="left";
+      svg.appendChild(txt(px(p.x)+(right?10:-10),py(p.y)+(p.dy||4),p.name,{fill:p.hi||p.lo?col:C.muted,fs:11,fw:p.hi||p.lo?600:400,anchor:right?"start":"end"}));
+    });
+  }
+
+  scatter("chartA",[
+    {name:"Sonnet 5.5",x:1.21,y:2.9,hi:true,side:"left"},
+    {name:"GLM 5.3 Flash",x:0.60,y:3.5,hi:true},
+    {name:"Haiku 5.5",x:0.73,y:4.35,dy:-6},
+    {name:"Luna Fast",x:0.69,y:4.45,side:"left",dy:14},
+    {name:"Gemini 3.5 Flash Lite",x:1.69,y:5.95,side:"left"},
+    {name:"Ling 3.0",x:0.90,y:6.75},
+    {name:"MiniMax M3",x:0.75,y:7.1,dy:17},
+    {name:"Haiku 4.5",x:0.72,y:7.15,side:"left",dy:4},
+    {name:"gpt-oss-120b (fastest)",x:0.36,y:7.95,lo:true,dy:-12},
+    {name:"Grok 4.1 Fast",x:0.57,y:8.05,dy:16},
+    {name:"GPT-4.1 Nano",x:0.68,y:9.4},
+    {name:"Ministral 14B",x:0.95,y:10.4}
+  ],{W:700,H:400,x0:0.2,x1:1.8,y0:1,y1:11,flip:true,
+    xticks:[0.4,0.8,1.2,1.6],xfmt:t=>t.toFixed(1)+" s",yticks:[1,3,5,7,9,11],yfmt:t=>t,
+    xlabel:"time to first move (seconds, lower is quicker)",ylabel:"teaching place (1 = best)"});
+
+  scatter("chartB",[
+    {name:"Gemini 3.5 Flash Lite",x:26,y:75,hi:true},
+    {name:"Luna Fast",x:60,y:50,side:"left"},
+    {name:"GLM 5.3 Flash",x:71,y:50,dy:-6},
+    {name:"Haiku 5.5",x:76,y:38},
+    {name:"Sonnet 5.5",x:72,y:25,side:"left"},
+    {name:"Haiku 4.5",x:79,y:13,lo:true},
+    {name:"gpt-oss-120b",x:56,y:17,side:"left"}
+  ],{W:700,H:380,x0:15,x1:90,y0:0,y1:100,flip:false,
+    xticks:[20,40,60,80],xfmt:t=>t+"%",yticks:[0,25,50,75,100],yfmt:t=>t+"%",
+    xlabel:"share of turns longer than forty words",ylabel:"learners untangled"});
+})();
+</script>
+
+</body>
+</html>
