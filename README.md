@@ -2,7 +2,7 @@
 
 A three-stage benchmark for a voice coding tutor, and everything needed to run it again.
 
-**Read the paper:** [kobby-adjei.github.io/ai-tutor-benchmark](https://kobby-adjei.github.io/ai-tutor-benchmark/) · [PDF](paper/which-model-can-teach.pdf)
+**Read the paper:** [which-model-can-teach.pdf](paper/which-model-can-teach.pdf) · the web version, with live charts, is [`index.html`](index.html)
 
 By Kwabena Adu Adjei, October 2026. Built while choosing the model behind Blink, the voice tutor in [syncs](https://trysyncs.com).
 
